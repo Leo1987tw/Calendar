@@ -1,0 +1,127 @@
+* {
+    box-sizing: border-box;
+    margin: 0px;
+    padding: 0px;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    display: block;
+    display: flex;
+    flex-direction: column;
+    background-image: url(./background.webp);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100%;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px 20px;
+}
+
+main {
+    width: 100%;
+    flex: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+}
+
+footer {
+    padding: 16px 20px;
+    text-align: center;
+}
+
+.subject {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 20%;
+    border: 3px solid black;
+    border-bottom: none;
+}
+
+.month {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 200px;
+    height: 150px;
+    margin: 20px;
+    font-size: 4em;
+    font-weight: bold;
+    color: red;
+    border: 3px solid black;
+}
+
+.year {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 200px;
+    height: 150px;
+    margin: 60px;
+    font-size: 4em;
+    font-weight: bold;
+    color: red;
+    border: 3px solid black;
+}
+
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 150px);
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    padding: 20px;
+    border: 3px solid black;
+
+}
+
+.calendar>div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    margin: 2px;
+    font-size: 3em;
+    font-weight: bold;
+    color: red;
+    border: 3px solid black;
+}
+
+.month:hover, .calendar>div:hover {
+    background-color: lightskyblue;
+}
+
+.none {
+    opacity: 0;
+}
+
+.left {
+    position: fixed;
+    top:300px;
+    left: 100px;
+    width: 100px;
+    height: 300px;
+    border: 1px solid black;
+    background-color: yellowgreen;
+}
+
+.right{
+    position: fixed;
+    top:300px;
+    right: 100px;
+    width: 100px;
+    height: 300px;
+    border: 1px solid black;
+    background-color: yellowgreen;
+}
