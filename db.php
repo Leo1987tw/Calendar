@@ -5,13 +5,23 @@ date_default_timezone_set("Asia/Taipei");
 
 class DB {
     protected $dsn;
+    protected $options;
     protected $pdo;
     protected $table;
 
     function __construct($table){
-        $this->dsn = "mysql:host=localhost; charset=utf8; dbname=calendar";
-        $this->pdo = new PDO($this->dsn, 'root', '', []);
-        $this->table = $table;
+        $this->dsn = "mysql:host=localhost; charset=utf8mb4; dbname=calendar";
+        $this->options = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+        ];
+        try{
+            $this->pdo = new PDO($this->dsn, 'root', '', $this->options);
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->table = $table;
+        }catch(PDOException $e){
+            echo json_encode(['error' => 'database connected failed' . $e->getMessage()]);
+        };
     }
 
     protected function a2s($array){

@@ -21,42 +21,45 @@ $nextMonthYear = ($thisMonth == 12) ? $thisYear + 1 : $thisYear;
 ?>
 
 <div class="subject">
-    <div class="month"><?= isset($_GET['month']) ? date("M", strtotime($_GET['month'])) : date("M");;?></div>
-    <div class="year"><?= isset($_GET['month']) ? date("Y", strtotime($_GET['month'])) : date("Y")?></div>
+    <div class="month"><?= isset($_GET['month']) ? date("M", strtotime($_GET['month'])) : date("M");; ?></div>
+    <div class="year"><?= isset($_GET['month']) ? date("Y", strtotime($_GET['month'])) : date("Y") ?></div>
 </div>
 
 <div class="calendar">
 
-<div class="weekday">Sunday</div>
-<div class="weekday">Monday</div>
-<div class="weekday">Tuesday</div>
-<div class="weekday">Wednesday</div>
-<div class="weekday">Thursday</div>
-<div class="weekday">Friday</div>
-<div class="weekday">Saturday</div>
+    <div class="weekday">Sunday</div>
+    <div class="weekday">Monday</div>
+    <div class="weekday">Tuesday</div>
+    <div class="weekday">Wednesday</div>
+    <div class="weekday">Thursday</div>
+    <div class="weekday">Friday</div>
+    <div class="weekday">Saturday</div>
 
-<?php
+    <?php
 
-for($i = 0; $i < $numberOfWeeksThisMonth; $i++){
-    for($j = 0; $j < 7; $j++){
-        if($i * 7 + $j >= $firstDayOfThisMonth && $i * 7 + $j <= $firstDayOfThisMonth + $numberOfDaysThisMonth - 1){
-            $day = $i * 7 + $j - $firstDayOfThisMonth + 1;
-            echo "<div class=\"date week-$i\" id=\"$thisYear-$thisMonth-$day\">";
-            echo $day;
-        }elseif($i * 7 + $j < $firstDayOfThisMonth) {
-            $day = $numberOfDaysPrevMonth - $firstDayOfThisMonth + 1 + $j;
-            echo "<div class=\"date week-$i\" id=\"$prevMonthYear-$prevMonth-$day\">";
-            echo $day;
-        }elseif($i * 7 + $j > $firstDayOfThisMonth + $numberOfDaysThisMonth - 1) {
-            $day = $i * 7 + $j - $firstDayOfThisMonth + 1 - $numberOfDaysThisMonth;
-            echo "<div class=\"date week-$i\" id=\"$nextMonthYear-$nextMonth-$day\">";
-            echo $day;
+    for ($i = 0; $i < $numberOfWeeksThisMonth; $i++) {
+        for ($j = 0; $j < 7; $j++) {
+            if ($i * 7 + $j >= $firstDayOfThisMonth && $i * 7 + $j <= $firstDayOfThisMonth + $numberOfDaysThisMonth - 1) {
+                $day = $i * 7 + $j - $firstDayOfThisMonth + 1;
+                $sday = sprintf("%02d", $day);
+                echo "<div class=\"date week-$i\" id=\"$thisYear-$thisMonth-$sday\">";
+                echo $day;
+            } elseif ($i * 7 + $j < $firstDayOfThisMonth) {
+                $day = $numberOfDaysPrevMonth - $firstDayOfThisMonth + 1 + $j;
+                $sday = sprintf("%02d", $day);
+                echo "<div class=\"date week-$i\" id=\"$prevMonthYear-$prevMonth-$sday\">";
+                echo $day;
+            } elseif ($i * 7 + $j > $firstDayOfThisMonth + $numberOfDaysThisMonth - 1) {
+                $day = $i * 7 + $j - $firstDayOfThisMonth + 1 - $numberOfDaysThisMonth;
+                $sday = sprintf("%02d", $day);
+                echo "<div class=\"date week-$i\" id=\"$nextMonthYear-$nextMonth-$sday\">";
+                echo $day;
+            }
+            echo "</div>";
         }
-        echo "</div>";
     }
-}
 
-?>
+    ?>
 
 </div>
 
@@ -91,40 +94,51 @@ for($i = 0; $i < $numberOfWeeksThisMonth; $i++){
 
     // var activeRectangle = null;
 
-    calendar.addEventListener('click', function(event){
+    window.addEventListener('click', function(event) {
         var date = event.target.closest('.date');
 
-        if(!date){
-            return;
-        }
+        // if (!date) {
+        //     return;
+        // // }
 
-        var classListArrayOfDate = Array.from(date.classList);
-        var thisWeek = classListArrayOfDate.find(className => className.startsWith('week-'));
+        // var classListArrayOfDate = Array.from(date.classList);
+        // var thisWeek = classListArrayOfDate.find(className => className.startsWith('week-'));
 
-        console.log(thisWeek);
+        // console.log(thisWeek);
 
-        if(!date || date.classList.contains('none') || date.classList.contains('weekday')){
-            return;
-        }
+        // if (!date || date.classList.contains('none') || date.classList.contains('weekday')) {
+        //     return;
+        // }
 
-        var dateId = date.id;
-        var dateNumber = date.innerText;
+        // var dateId = date.id;
+        // var dateNumber = date.innerText;
 
-        console.log(dateId);
-        console.log(dateNumber);
+        // console.log(dateId);
+        // console.log(dateNumber);
 
-        let thisCells = document.querySelectorAll(`.calendar > .${thisWeek}`);
-        let othersCells = document.querySelectorAll(`.calendar > div:not(.weekday):not(.${thisWeek})`);
-        let someCellIsHidden = document.querySelector('.calendar > div.none')
+        // let thisCells = document.querySelectorAll(`.calendar > .${thisWeek}`);
+        // let othersCells = document.querySelectorAll(`.calendar > div:not(.weekday):not(.${thisWeek})`);
+        let someCellIsHidden = document.querySelector('.calendar > div.none');
 
-        if(someCellIsHidden){
+        if (someCellIsHidden) {
+            if(event.target.closest('.time-block'))return;
+
+            let activeCell = document.querySelector('.calendar >  div.active');
+
+            if(!activeCell)return;
+
+            var classListArrayOfDate = Array.from(activeCell.classList);
+            var thisWeek = classListArrayOfDate.find(className => className.startsWith('week-'));
+
+            let othersCells = document.querySelectorAll(`.calendar > div:not(.weekday):not(.${thisWeek})`);
+            let thisCells = document.querySelectorAll(`.calendar > .${thisWeek}`);
             thisCells.forEach(cell => cell.classList.remove('active'));
             othersCells.forEach(cell => {
-                cell.classList.remove('none');
                 cell.classList.add('collapse');
+                cell.classList.remove('none');
             });
-            subject.classList.remove('none');
             subject.classList.add('collapse');
+            subject.classList.remove('none');
 
             setTimeout(() => {
                 othersCells.forEach(cell => {
@@ -134,11 +148,32 @@ for($i = 0; $i < $numberOfWeeksThisMonth; $i++){
             }, 10);
 
             thisCells.forEach(cell => {
-                if(cell.dataset.day){
+                if (cell.dataset.day) {
                     cell.innerHTML = cell.dataset.day;
                 }
             });
-        }else {
+        } else {
+            if (!date) {
+                return;
+            }
+
+            var classListArrayOfDate = Array.from(date.classList);
+            var thisWeek = classListArrayOfDate.find(className => className.startsWith('week-'));
+
+            console.log(thisWeek);
+
+            if (!date || date.classList.contains('none') || date.classList.contains('weekday')) {
+                return;
+            }
+
+            var dateId = date.id;
+            var dateNumber = date.innerText;
+
+            console.log(dateId);
+            console.log(dateNumber);
+
+            let thisCells = document.querySelectorAll(`.calendar > .${thisWeek}`);
+            let othersCells = document.querySelectorAll(`.calendar > div:not(.weekday):not(.${thisWeek})`);
             thisCells.forEach(cell => cell.classList.add('active'));
             othersCells.forEach(cell => {
                 cell.classList.remove('none');
@@ -157,26 +192,24 @@ for($i = 0; $i < $numberOfWeeksThisMonth; $i++){
             }, 400);
 
             thisCells.forEach(cell => {
-                if(!cell.dataset.day){
+                if (!cell.dataset.day) {
                     cell.dataset.day = cell.innerHTML;
                 }
 
                 let cellId = cell.id;
 
-                cell.innerText = "Connecting";
+                cell.innerText = "";
 
-                fetch(`get_events.php?date=${cellId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if(data.success){
-                            cell.innerHTML = ``;
-                        }else {
-                            cell.innerHTML = ``
-                        }
+                fetch('api_get_events.php')
+                    .then(response => {
+                        if (!response.ok) throw new Error('network response failed');
+                        return response.json();
                     })
-                    .catch(error => {
-                        cell.innerHTML = ``
-                    });
+                    .then(events => {
+                        console.log("success fetch backend data:", events);
+                        renderEventsToCalendar(events);
+                    })
+                    .catch(error => console.error('fetch failed:', error));
             });
         }
 
@@ -253,4 +286,52 @@ for($i = 0; $i < $numberOfWeeksThisMonth; $i++){
     //         closeModal();
     //     }
     // });
+
+    function renderEventsToCalendar(events) {
+        events.forEach(event => {
+            const date = event.event_date;
+            const start = event.start_time.substring(0, 5);
+            const end = event.end_time.substring(0, 5);
+            const color = event.bg_color;
+            const title = event.title;
+
+            const targetColumn = document.getElementById(date);
+
+            if (targetColumn && targetColumn.classList.contains('active')) {
+                const isAlreadyExist = targetColumn.querySelector(`[data-event-id="${event.id}"]`);
+                if (isAlreadyExist) return;
+
+                const durationMinutes = getDurationInMinutes(event.during_time);
+                const startMinutesFromMidnight = getDurationInMinutes(start);
+                const pixelsPerMinute = 720 / 1440;
+
+                const topPosition = startMinutesFromMidnight * pixelsPerMinute + 5;
+                const blockHeight = durationMinutes * pixelsPerMinute;
+
+                console.log(`event ${title} in ${date} with duration ${durationMinutes}minutes`);
+
+                const eventElement = document.createElement('div');
+                eventElement.className = 'date time-block';
+                eventElement.setAttribute('data-event-id', event.id);
+
+                eventElement.innerHTML = `
+                <div style="font-size: 12px; opacity: 0.8; margin-top: 2px;">${start.substring(0, 5)}</div>
+                    <div style="font-weight: bold; line-height: 1.2;">${title}</div>
+                `;
+
+                eventElement.style.top = `${topPosition}px`;
+                eventElement.style.height = `${blockHeight}px`;
+                eventElement.style.backgroundColor = color;
+
+
+                targetColumn.appendChild(eventElement);
+            }
+        });
+    }
+
+    function getDurationInMinutes(duringTime) {
+        if (!duringTime) return 0;
+        const [hours, minutes, seconds] = duringTime.split(':').map(Number);
+        return (hours * 60) + minutes;
+    }
 </script>
