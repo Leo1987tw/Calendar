@@ -124,5 +124,6 @@ function to($url){
 }
 
 $Events = new DB("events");
+$Types = new DB("types");
 
 ?>

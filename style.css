@@ -198,7 +198,7 @@ footer {
     background-color: white;
 }
 
-.form-block {
+.input-block {
     display: flex;
     flex-direction: column;
     justify-content: start;
@@ -211,14 +211,7 @@ footer {
     border-radius: 25px;
 }
 
-.form-block>form {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.form-block>form>div {
+.input-block>div {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -230,6 +223,11 @@ label {
 
 input {
     margin: 20px;
+}
+
+.event-btn {
+    display: block;
+    margin: 10px 5px;
 }
 
 .time-block {

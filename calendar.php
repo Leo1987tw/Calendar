@@ -66,51 +66,68 @@
     </div>
 </div>
 
-<div class="form-block">
-    <form action="" method="get">
-        <div>
-            <label for="month">選擇月份</label>
-            <input type="month" id="month" name="month" value="<?= $thisYear . '-' . sprintf('%02d', $thisMonth); ?>" onchange="this.form.submit()">
-        </div>
-    </form>
-    <form action="./update_event.php" method="post">
-        <div>
-            <label for="date">選擇日期</label>
-            <input type="date" id="date" name="date" readonly>
-        </div>
-        <div>
-            <label for="start-time">開始時間</label>
-            <input type="time" id="start-time" name="start-time">
-        </div>
-        <div>
-            <label for="end-time">結束時間</label>
-            <input type="time" id="end-time" name="end-time">
-        </div>
-        <div>
-            <label for="during-time">事件期間</label>
-            <input type="time" id="during-time" name="during-time" readonly>
-        </div>
-        <div>
-            <select name="events" id="select-event">
-                <?php
-                $events = $Events->all();
-                foreach ($events as $event):
-                ?>
-                    <option value="<?= $event['id']; ?>">
-                        <?= $event['title']; ?>
-                    </option>
-                <?php
-                endforeach;
-                ?>
-            </select>
-        </div>
-        <input type="text" id="new-event" placeholder="新事件">
-        <button type="button" class="add-event-btn" onclick="addOption()">新增事件</button>
-        <button type="button" class="edit-event-btn" onclick="editOption()">編輯事件</button>
-        <button type="button" class="delete-event-btn" onclick="deleteOption()">刪除事件</button>
-        <input type="reset" value="重置">
-        <input type="submit" value="送出">
-    </form>
+<div class="input-block">
+    <div>
+        <label for="month">選擇月份</label>
+        <input type="month" id="month" name="month" value="<?= $thisYear . '-' . sprintf('%02d', $thisMonth); ?>" onchange="this.form.submit()">
+    </div>
+    <div>
+        <label for="date">選擇日期</label>
+        <input type="date" id="date" name="date" readonly>
+    </div>
+    <div>
+        <label for="start-time">開始時間</label>
+        <input type="time" id="start-time" name="start-time">
+    </div>
+    <div>
+        <label for="end-time">結束時間</label>
+        <input type="time" id="end-time" name="end-time">
+    </div>
+    <div>
+        <label for="during-time">事件期間</label>
+        <input type="time" id="during-time" name="during-time" readonly>
+    </div>
+    <div>
+        <label for="type">行程類型</label>
+        <select name="type" id="type">
+            <?php
+            $types = $Types->all();
+            foreach ($types as $type):
+            ?>
+                <option id="<?= $type['id']; ?>" value="<?= $type['id']; ?>">
+                    <?= $type['name']; ?>
+                </option>
+            <?php
+            endforeach;
+            ?>
+        </select>
+    </div>
+    <div>
+        <label for="title">行程標題</label>
+        <input type="text" id="title">
+    </div>
+    <div>
+        <label for="description">行程描述</label>
+        <textarea name="description" id="description"></textarea>
+    </div>
+    <div>
+        <label for="color">文字顏色</label>
+        <input type="color" name="color" id="color">
+    </div>
+    <div>
+        <label for="background-color">背景顏色</label>
+        <input type="color" name="background-color" id="background-color">
+    </div>
+    <div>
+        <label for="border-color">邊線顏色</label>
+        <input type="color" name="border-color" id="border-color">
+    </div>
+    <div style="display: flex;">
+        <input type="hidden" id="id" name="id">
+        <button type="button" class="event-btn" onclick="addEvent()">新增行程</button>
+        <button type="button" class="event-btn" onclick="editEvent()">編輯行程</button>
+        <button type="button" class="event-btn" onclick="deleteEvent()">刪除行程</button>
+    </div>
 </div>
 
 <script>
@@ -156,10 +173,10 @@
                     let thisColumn = classListArrayOfColumn.find(className => className.startsWith('column-'));
                     let thisCell = document.querySelectorAll(`.calendar > .${thisColumn}`);
                     thisCell.forEach(cell => cell.classList.add('checked'));
-                    isTimeBlock();
+                    isTimeBlock(event);
                     return
                 } else {
-                    isTimeBlock();
+                    isTimeBlock(event);
                     return
                 }
             }
@@ -317,7 +334,7 @@
         }
     });
 
-    function isTimeBlock() {
+    function isTimeBlock(event) {
         if (event.target.closest('.time-block')) {
             const timeBlock = event.target.closest('.time-block');
 
@@ -329,14 +346,25 @@
             const startTime = timeBlock.getAttribute('data-start');
             const endTime = timeBlock.getAttribute('data-end');
 
-            const selectEvent = document.getElementById('select-event');
-            const startInput = document.getElementById('start-time');
-            const endInput = document.getElementById('end-time');
-            const duringInput = document.getElementById('during-time');
+            const type = timeBlock.getAttribute('data-type');
+            const title = timeBlock.getAttribute('data-title');
+            const description = timeBlock.getAttribute('data-description');
 
-            selectEvent.value = eventId;
-            startInput.value = startTime.substring(0, 5);
-            endInput.value = endTime.substring(0, 5);
+            const color = timeBlock.getAttribute('data-color');
+            const backgrounkColor = timeBlock.getAttribute('data-background-color');
+            const borderColor = timeBlock.getAttribute('data-border-color');
+
+            $("#id").val(eventId);
+            $("#start-time").val(startTime.substring(0, 5));
+            $("#end-time").val(endTime.substring(0, 5));
+
+            $("#type").val(type);
+            $("#title").val(title);
+            $("#description").val(description);
+            
+            $("#color").val(color);
+            $("#background-color").val(backgrounkColor);
+            $("#border-color").val(borderColor);
 
             if (startTime && endTime) {
                 const [startHour, startMinute] = startTime.split(':').map(Number);
@@ -346,18 +374,23 @@
 
                 const h = String(Math.floor(difference / 60)).padStart(2, '0');
                 const m = String(difference % 60).padStart(2, '0');
-                duringInput.value = `${h}:${m}`;
+                $("#during-time").val(`${h}:${m}`);
             }
         }
     }
 
     function renderEventsToCalendar(events) {
         events.forEach(event => {
+            const id = event.id
             const date = event.event_date;
             const start = event.start_time.substring(0, 5);
             const end = event.end_time.substring(0, 5);
-            const color = event.bg_color;
+            const type = event.type;
             const title = event.title;
+            const description = event.description;
+            const color = event.color;
+            const backgroundColor = event.background_color;
+            const borderColor = event.border_color;
 
             const targetColumn = document.querySelector(`
                 .calendar>.date[data-id="${date}"]:not(.weekday)
@@ -365,7 +398,7 @@
 
             if (targetColumn && targetColumn.classList.contains('active')) {
                 const isAlreadyExist = targetColumn.querySelector(`
-                    [data-event-id="${event.id}"]
+                    [data-event-id="${id}"]
                 `);
                 if (isAlreadyExist) return;
 
@@ -380,19 +413,29 @@
 
                 const eventElement = document.createElement('div');
                 eventElement.className = 'time-block';
-                eventElement.setAttribute('data-event-id', event.id);
+                eventElement.setAttribute('data-event-id', id);
 
                 eventElement.setAttribute('data-start', start);
                 eventElement.setAttribute('data-end', end);
+                
+                eventElement.setAttribute('data-type', type);
+                eventElement.setAttribute('data-title', title);
+                eventElement.setAttribute('data-description', description);
+
+                eventElement.setAttribute('data-color', color);
+                eventElement.setAttribute('data-background-color', backgroundColor);
+                eventElement.setAttribute('data-border-color', borderColor);
 
                 eventElement.innerHTML = `
-                <div style="font-size: 12px; opacity: 0.8; margin-top: 2px;">${start.substring(0, 5)}</div>
-                    <div style="font-weight: bold; line-height: 1.2;">${title}</div>
+                <div style="font-size: 12px; opacity: 0.8; margin-top: 2px;">${start}</div>
+                    <div style="font-weight: bold; line-height: 1.2;">${type}${title}${description}</div>
                 `;
 
                 eventElement.style.top = `${topPosition}px`;
                 eventElement.style.height = `${blockHeight}px`;
-                eventElement.style.backgroundColor = color;
+                eventElement.style.color = color;
+                eventElement.style.backgroundColor = backgroundColor;
+                eventElement.style.borderColor = borderColor;
 
 
                 targetColumn.appendChild(eventElement);
@@ -404,5 +447,82 @@
         if (!duringTime) return 0;
         const [hours, minutes, seconds] = duringTime.split(':').map(Number);
         return (hours * 60) + minutes;
+    }
+
+    function addEvent() {
+        let date = $("#date").val();
+        let startTime = $("#start-time").val();
+        let endTime = $("#end-time").val();
+        let type = $("#type").val();
+        let title = $("#title").val();
+        let description = $("#description").val();
+        let color = $("#color").val() ?? '#000000';
+        let backgroundColor = $("#background-color").val() ?? '#FFFFFF';
+        let borderColor = $("#border-color").val() ?? '#000000';
+
+        if (date == "" || startTime == "" || endTime == "") {
+            alert("請填入數值");
+            return;
+        }
+
+        $.post("./api_add_event.php", {
+            date,
+            startTime,
+            endTime,
+            type,
+            title,
+            description,
+            color,
+            backgroundColor,
+            borderColor
+        }, () => {
+            alert("成功新增一個行程\n您變得更忙了");
+        })
+    }
+
+    function editEvent() {
+        let id = $("#id").val();
+        let date = $("#date").val();
+        let startTime = $("#start-time").val();
+        let endTime = $("#end-time").val();
+        let type = $("#type").val();
+        let title = $("#title").val();
+        let description = $("#description").val();
+        let color = $("#color").val() ?? '#000000';
+        let backgroundColor = $("#background-color").val() ?? '#FFFFFF';
+        let borderColor = $("#border-color").val() ?? '#000000';
+
+        if (date == "" || startTime == "" || endTime == "") {
+            alert("請填入數值");
+            return;
+        }
+
+        $.post("./api_edit_event.php", {
+            id,
+            date,
+            startTime,
+            endTime,
+            type,
+            title,
+            description,
+            color,
+            backgroundColor,
+            borderColor
+        }, () => {
+            alert("成功修改一個行程\n可以這樣改了又改的嗎");
+        })
+    }
+
+    function deleteEvent(){
+        let id = $("#id").val();
+
+        if(id == "" || id == null){
+            alert("需要選擇一個行程");
+            return;
+        }
+
+        $.post("./api_delete_event.php", {id}, () => {
+            alert("成功刪除一個行程\n您變得更閒了");
+        });
     }
 </script>
