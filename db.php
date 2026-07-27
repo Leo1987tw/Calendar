@@ -10,20 +10,22 @@ class DB {
     protected $table;
 
     function __construct($table){
-        $this->dsn = "mysql:host=localhost; charset=utf8mb4; dbname=calendar";
+        $config = require "db_config.php";
+        $this->dsn = "mysql:host=" . $config['host'] . "; charset=utf8mb4; dbname=" . $config['dbname'];
         $this->options = [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, 
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, 
+            PDO::ATTR_EMULATE_PREPARES => false
         ];
         try{
-            $this->pdo = new PDO($this->dsn, 'root', '', $this->options);
+            $this->pdo = new PDO($this->dsn, $config['username'], $config['password'], $this->options);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->table = $table;
         }catch(PDOException $e){
             echo json_encode(['error' => 'database connected failed' . $e->getMessage()]);
         };
     }
-
+    
     protected function a2s($array){
         $tmp = [];
         foreach($array as $key => $value){
