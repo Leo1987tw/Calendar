@@ -134,6 +134,8 @@
     var title = document.querySelector('.title');
     var calendar = document.querySelector('.calendar');
 
+    var globalActiveCells = null;
+
     // 防止連點所設旗標
     let isAnimating = false;
 
@@ -223,6 +225,8 @@
                     cell.innerHTML = cell.dataset.day;
                 }
             });
+
+            globalActiveCells = null;
         } else {
             // 點擊日期格以外的格子或星期格沒有反應
             if (!date || date.classList.contains('weekday')) {
@@ -309,28 +313,11 @@
                 isAnimating = false;
             }, 400);
 
+            globalActiveCells = thisCells;
+
             // 呼叫資料庫後進行渲染
-            thisCells.forEach(cell => {
-                if (!cell.dataset.day) {
-                    cell.dataset.day = cell.innerHTML;
-                }
+            renderEventsToCalendar(thisCells);
 
-                let cellId = cell.dataset.id;
-
-                cell.innerText = "";
-
-                fetch('api_get_events.php')
-                    .then(response => {
-                        if (!response.ok) throw new Error('network response failed');
-                        return response.json();
-                    })
-                    .then(events => {
-                        // console.log(events);
-
-                        renderEventsToCalendar(events);
-                    })
-                    .catch(error => console.error('fetch failed:', error));
-            });
         }
     });
 
@@ -361,7 +348,7 @@
             $("#type").val(type);
             $("#title").val(title);
             $("#description").val(description);
-            
+
             $("#color").val(color);
             $("#background-color").val(backgrounkColor);
             $("#border-color").val(borderColor);
@@ -379,70 +366,149 @@
         }
     }
 
-    function renderEventsToCalendar(events) {
-        events.forEach(event => {
-            const id = event.id
-            const date = event.event_date;
-            const start = event.start_time.substring(0, 5);
-            const end = event.end_time.substring(0, 5);
-            const type = event.type;
-            const title = event.title;
-            const description = event.description;
-            const color = event.color;
-            const backgroundColor = event.background_color;
-            const borderColor = event.border_color;
-
-            const targetColumn = document.querySelector(`
-                .calendar>.date[data-id="${date}"]:not(.weekday)
-            `);
-
-            if (targetColumn && targetColumn.classList.contains('active')) {
-                const isAlreadyExist = targetColumn.querySelector(`
-                    [data-event-id="${id}"]
-                `);
-                if (isAlreadyExist) return;
-
-                const durationMinutes = getDurationInMinutes(event.during_time);
-                const startMinutesFromMidnight = getDurationInMinutes(start);
-                const pixelsPerMinute = 720 / 1440;
-
-                const topPosition = startMinutesFromMidnight * pixelsPerMinute + 5;
-                const blockHeight = durationMinutes * pixelsPerMinute;
-
-                // console.log(`event ${title} in ${date} with duration ${durationMinutes}minutes`);
-
-                const eventElement = document.createElement('div');
-                eventElement.className = 'time-block';
-                eventElement.setAttribute('data-event-id', id);
-
-                eventElement.setAttribute('data-start', start);
-                eventElement.setAttribute('data-end', end);
-                
-                eventElement.setAttribute('data-type', type);
-                eventElement.setAttribute('data-title', title);
-                eventElement.setAttribute('data-description', description);
-
-                eventElement.setAttribute('data-color', color);
-                eventElement.setAttribute('data-background-color', backgroundColor);
-                eventElement.setAttribute('data-border-color', borderColor);
-
-                eventElement.innerHTML = `
-                <div style="font-size: 12px; opacity: 0.8; margin-top: 2px;">${start}</div>
-                    <div style="font-weight: bold; line-height: 1.2;">${type}${title}${description}</div>
-                `;
-
-                eventElement.style.top = `${topPosition}px`;
-                eventElement.style.height = `${blockHeight}px`;
-                eventElement.style.color = color;
-                eventElement.style.backgroundColor = backgroundColor;
-                eventElement.style.borderColor = borderColor;
-
-
-                targetColumn.appendChild(eventElement);
+    function renderEventsToCalendar(cells) {
+        cells.forEach(cell => {
+            if (!cell.dataset.day) {
+                cell.dataset.day = cell.innerHTML;
             }
-        });
-    }
 
+            let cellId = cell.dataset.id;
+
+            cell.innerText = "";
+        });
+
+        fetch('api_get_events.php')
+            .then(response => {
+                if (!response.ok) throw new Error('network response failed');
+                return response.json();
+            })
+            .then(events => {
+                // console.log(events);
+
+                events.forEach(event => {
+                    const id = event.id
+                    const date = event.event_date;
+                    const start = event.start_time.substring(0, 5);
+                    const end = event.end_time.substring(0, 5);
+                    const type = event.type;
+                    const title = event.title;
+                    const description = event.description;
+                    const color = event.color;
+                    const backgroundColor = event.background_color;
+                    const borderColor = event.border_color;
+
+                    const targetColumn = document.querySelector(`
+                        .calendar>.date[data-id="${date}"]:not(.weekday)
+                    `);
+
+                    if (targetColumn && targetColumn.classList.contains('active')) {
+                        const isAlreadyExist = targetColumn.querySelector(`
+                            [data-event-id="${id}"]
+                        `);
+                        if (isAlreadyExist) return;
+
+                        const durationMinutes = getDurationInMinutes(event.during_time);
+                        const startMinutesFromMidnight = getDurationInMinutes(start);
+                        const pixelsPerMinute = 720 / 1440;
+
+                        const topPosition = startMinutesFromMidnight * pixelsPerMinute + 5;
+                        const blockHeight = durationMinutes * pixelsPerMinute;
+
+                        // console.log(`event ${title} in ${date} with duration ${durationMinutes}minutes`);
+
+                        const eventElement = document.createElement('div');
+                        eventElement.className = 'time-block';
+                        eventElement.setAttribute('data-event-id', id);
+
+                        eventElement.setAttribute('data-start', start);
+                        eventElement.setAttribute('data-end', end);
+
+                        eventElement.setAttribute('data-type', type);
+                        eventElement.setAttribute('data-title', title);
+                        eventElement.setAttribute('data-description', description);
+
+                        eventElement.setAttribute('data-color', color);
+                        eventElement.setAttribute('data-background-color', backgroundColor);
+                        eventElement.setAttribute('data-border-color', borderColor);
+
+                        eventElement.setAttribute('draggable', 'true');
+
+                        eventElement.addEventListener('dragstart', (event) => {
+                            event.dataTransfer.setData('text/plain', id);
+                            eventElement.style.opacity = '0.4';
+                        });
+
+                        eventElement.addEventListener('dragend', () => {
+                            eventElement.style.opacity = '1';
+                        })
+
+                        eventElement.style.resize = 'vertical';
+                        eventElement.style.overflow = 'hidden';
+
+                        const resizeObserver = new ResizeObserver(entries => {
+                            for (let entry of entries) {
+                                if (eventElement.dataset.initResize === 'true') {
+                                    const currentHeight = entry.contentRect.height;
+                                    const pixelsPerMinute = 720 / 1440;
+                                    const newDurationMinutes = Math.round(currentHeight / pixelsPerMinute);
+
+                                    const startTimeString = eventElement.getAttribute('data-start');
+
+                                    let [hours, minutes] = startTimeString.split(':').map(Number);
+                                    let totalMinutes = hours * 60 + newDutationMinutes;
+
+                                    if(totalMinutes > 1439)totalMinutes = 1439;
+
+                                    const newEndHours = String(Math.floor(totalMinutes / 60)).padStart(2, '0');
+                                    const newEndMinutes = String(totalMinutes % 60).padStart(2, '0');
+                                    const newEndTimeString = `${newEndHours}:${NewEndMinutes}`
+
+                                    $("#end-time").val(newEndTimeString);
+                                    $("#event-id").val(id);
+                                    $("#start-time").val(startTimeString);
+
+                                    eventElement.setAttribute('data-end', newEndTimeString);
+
+                                    // console.log(`change time:${newEndTimeString}`);
+                                }
+                            }
+                        })
+
+                        eventElement.innerHTML = `
+                            <div style="font-size: 12px; opacity: 0.8; margin-top: 2px;">${start}</div>
+                            <div style="font-weight: bold; line-height: 1.2;">${type}${title}${description}</div>
+                        `;
+
+                        eventElement.style.top = `${topPosition}px`;
+                        eventElement.style.height = `${blockHeight}px`;
+                        eventElement.style.color = color;
+                        eventElement.style.backgroundColor = backgroundColor;
+                        eventElement.style.borderColor = borderColor;
+
+
+                        targetColumn.appendChild(eventElement);
+
+                        resizeObserver.observe(eventElement);
+
+                        eventElement.addEventListener('mousedown', (event) => {
+                            if (event.offsetY >= eventElement.clientHeight - 10) {
+                                eventElement.dataset.initResize = 'true';
+                                event.stopPropagation();
+                            }
+                        })
+                    }
+                });
+            })
+            .catch(error => console.error('fetch failed:', error));
+    }
+    
+    window.addEventListener('mouseup', () => {
+        const resizingElement = document.querySelector('[data-init-resize="true"]');
+        if (resizingElement) {
+            resizingElement.dataset.initResize = 'false';
+        }
+    })
+    
     function getDurationInMinutes(duringTime) {
         if (!duringTime) return 0;
         const [hours, minutes, seconds] = duringTime.split(':').map(Number);
@@ -450,6 +516,8 @@
     }
 
     function addEvent() {
+        // 防止事件冒泡
+        event.stopPropagation();
         let date = $("#date").val();
         let startTime = $("#start-time").val();
         let endTime = $("#end-time").val();
@@ -477,10 +545,16 @@
             borderColor
         }, () => {
             alert("成功新增一個行程\n您變得更忙了");
+            if (globalActiveCells) {
+                renderEventsToCalendar(globalActiveCells);
+            }
         })
     }
 
     function editEvent() {
+        // 防止事件冒泡
+        event.stopPropagation();
+
         let id = $("#id").val();
         let date = $("#date").val();
         let startTime = $("#start-time").val();
@@ -510,19 +584,30 @@
             borderColor
         }, () => {
             alert("成功修改一個行程\n可以這樣改了又改的嗎");
+            if (globalActiveCells) {
+                renderEventsToCalendar(globalActiveCells);
+            }
         })
     }
 
-    function deleteEvent(){
+    function deleteEvent() {
+        // 防止事件冒泡
+        event.stopPropagation();
+
         let id = $("#id").val();
 
-        if(id == "" || id == null){
+        if (id == "" || id == null) {
             alert("需要選擇一個行程");
             return;
         }
 
-        $.post("./api_delete_event.php", {id}, () => {
+        $.post("./api_delete_event.php", {
+            id
+        }, () => {
             alert("成功刪除一個行程\n您變得更閒了");
+            if (globalActiveCells) {
+                renderEventsToCalendar(globalActiveCells);
+            }
         });
     }
 </script>
