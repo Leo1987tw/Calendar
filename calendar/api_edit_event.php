@@ -8,6 +8,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         'event_date' => $_POST['date'], 
         'start_time' => $_POST['startTime'], 
         'end_time' => $_POST['endTime'], 
+        'type_id' => $_POST['type'], 
         'title' => $_POST['title'], 
         'description' => $_POST['description'], 
         'color' => $_POST['color'], 
@@ -19,9 +20,9 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     $result = $Events->save($data);
 
     if($result){
-        echo json_encode(['status' => 'success', 'message' => '修改成功']);
+        echo json_encode(['status' => 'success', 'message' => '新增成功']);
     }else {
-        echo json_encode(['status' => 'error', 'message' => '修改失敗']);
+        echo json_encode(['status' => 'error', 'message' => '新增失敗']);
     }
 }
 

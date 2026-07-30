@@ -7,6 +7,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         'event_date' => $_POST['date'], 
         'start_time' => $_POST['startTime'], 
         'end_time' => $_POST['endTime'], 
+        'type_id' => $_POST['type'], 
         'title' => $_POST['title'], 
         'description' => $_POST['description'], 
         'color' => $_POST['color'], 

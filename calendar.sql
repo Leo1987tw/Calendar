@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2026-07-28 08:37:22
+-- 產生時間： 2026-07-30 20:31:42
 -- 伺服器版本： 10.4.32-MariaDB
 -- PHP 版本： 8.2.12
 
@@ -33,7 +33,7 @@ CREATE TABLE `events` (
   `start_time` time NOT NULL,
   `end_time` time NOT NULL,
   `during_time` time GENERATED ALWAYS AS (timediff(`end_time`,`start_time`)) VIRTUAL,
-  `type` int(11) UNSIGNED NOT NULL,
+  `type_id` int(10) UNSIGNED NOT NULL,
   `title` varchar(100) NOT NULL,
   `description` text NOT NULL,
   `color` varchar(7) NOT NULL,
@@ -43,14 +43,6 @@ CREATE TABLE `events` (
   `deleted_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- 傾印資料表的資料 `events`
---
-
-INSERT INTO `events` (`id`, `event_date`, `start_time`, `end_time`, `type`, `title`, `description`, `color`, `background_color`, `border_color`, `created_at`, `deleted_at`) VALUES
-(3, '2026-07-07', '03:00:00', '10:00:00', 1, '', '', '', '', '', '2026-07-28 06:24:44', NULL),
-(7, '2026-07-16', '17:36:00', '19:36:00', 0, '', '', '#000000', '#ffffff', '#3b82f6', '2026-07-28 06:36:44', NULL);
-
 -- --------------------------------------------------------
 
 --
@@ -59,15 +51,10 @@ INSERT INTO `events` (`id`, `event_date`, `start_time`, `end_time`, `type`, `tit
 
 CREATE TABLE `types` (
   `id` int(11) UNSIGNED NOT NULL,
-  `name` varchar(100) NOT NULL
+  `name` varchar(100) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `deleted_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- 傾印資料表的資料 `types`
---
-
-INSERT INTO `types` (`id`, `name`) VALUES
-(1, '');
 
 --
 -- 已傾印資料表的索引
@@ -77,7 +64,8 @@ INSERT INTO `types` (`id`, `name`) VALUES
 -- 資料表索引 `events`
 --
 ALTER TABLE `events`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_events_type_id_types_id` (`type_id`) USING BTREE;
 
 --
 -- 資料表索引 `types`
@@ -93,13 +81,23 @@ ALTER TABLE `types`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `events`
 --
 ALTER TABLE `events`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `types`
 --
 ALTER TABLE `types`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- 已傾印資料表的限制式
+--
+
+--
+-- 資料表的限制式 `events`
+--
+ALTER TABLE `events`
+  ADD CONSTRAINT `fk_events_type_id_types_id` FOREIGN KEY (`type_id`) REFERENCES `types` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -69,7 +69,7 @@ $numberOfDaysPrevMonth = date("t", strtotime($prevMonth));
             <h3>📅 行程編輯面板</h3>
             <span class="form-subheading">支援拖曳與 Ctrl+Z</span>
         </div>
-        
+
         <div class="form-grid-container">
             <div class="form-row">
                 <label for="month">選擇月份</label>
@@ -102,9 +102,9 @@ $numberOfDaysPrevMonth = date("t", strtotime($prevMonth));
                     if ($types) {
                         foreach ($types as $type):
                     ?>
-                        <option value="<?= htmlspecialchars($type['name']); ?>">
-                            <?= htmlspecialchars($type['name']); ?>
-                        </option>
+                            <option value="<?= htmlspecialchars($type['name']); ?>">
+                                <?= htmlspecialchars($type['name']); ?>
+                            </option>
                     <?php
                         endforeach;
                     }
@@ -114,7 +114,7 @@ $numberOfDaysPrevMonth = date("t", strtotime($prevMonth));
 
             <div class="form-row form-row-wide">
                 <label for="title">行程標題</label>
-                <input type="text" id="title" placeholder="輸入行程標題">
+                <input type="text" id="title" name="title" placeholder="輸入行程標題">
             </div>
 
             <div class="form-row form-row-wide">

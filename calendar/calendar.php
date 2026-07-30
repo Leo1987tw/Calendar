@@ -104,7 +104,7 @@
     </div>
     <div>
         <label for="title">行程標題</label>
-        <input type="text" id="title">
+        <input type="text" id="title" name="title">
     </div>
     <div>
         <label for="description">行程描述</label>
@@ -138,7 +138,7 @@
 
     // 防止連點所設旗標
     let isAnimating = false;
-
+    
     window.addEventListener('click', function(event) {
         if (isAnimating) return;
 
@@ -149,7 +149,7 @@
         // 檢查目前月曆是否為展開的狀態
         if (someCellIsHidden) {
             // 點擊表單沒有反應
-            if (event.target.closest('.form-block')) return;
+            if (event.target.closest('.input-block')) return;
             // 點擊日期或星期格進入監聽
             if (date) {
                 let dateId = date.dataset.id;
@@ -176,14 +176,14 @@
                     let thisCell = document.querySelectorAll(`.calendar > .${thisColumn}`);
                     thisCell.forEach(cell => cell.classList.add('checked'));
                     isTimeBlock(event);
-                    return
+                    return;
                 } else {
                     isTimeBlock(event);
-                    return
+                    return;
                 }
             }
 
-            let activeCell = document.querySelector('.calendar >  div.active');
+            let activeCell = document.querySelector('.calendar > div.active');
             let checkedCell = document.querySelector('.calendar > div.checked');
 
             var classListArrayOfRow = Array.from(activeCell.classList);
@@ -294,7 +294,7 @@
                     `);
 
                     if (weekdayCell) {
-                        weekdayCell.setAttribute('data-id', cell.dataset.id)
+                        weekdayCell.setAttribute('data-id', cell.dataset.id);
                     }
                 }
             });
@@ -390,7 +390,7 @@
                     const date = event.event_date;
                     const start = event.start_time.substring(0, 5);
                     const end = event.end_time.substring(0, 5);
-                    const type = event.type;
+                    const type = event.type_id;
                     const title = event.title;
                     const description = event.description;
                     const color = event.color;
@@ -436,7 +436,7 @@
                         eventElement.addEventListener('dragstart', (event) => {
                             event.dataTransfer.setData('text/plain', id);
                             event.dataTransfer.setData('text/plain', start);
-                            event.dataTransfer.setData('text/plain', event_during_time);
+                            event.dataTransfer.setData('text/plain', event.during_time);
                             eventElement.style.opacity = '0.4';
                         });
 
@@ -457,13 +457,13 @@
                                     const startTimeString = eventElement.getAttribute('data-start');
 
                                     let [hours, minutes] = startTimeString.split(':').map(Number);
-                                    let totalMinutes = hours * 60 + newDutationMinutes;
+                                    let totalMinutes = hours * 60 + newDurationMinutes;
 
                                     if(totalMinutes > 1439)totalMinutes = 1439;
 
                                     const newEndHours = String(Math.floor(totalMinutes / 60)).padStart(2, '0');
                                     const newEndMinutes = String(totalMinutes % 60).padStart(2, '0');
-                                    const newEndTimeString = `${newEndHours}:${NewEndMinutes}`
+                                    const newEndTimeString = `${newEndHours}:${newEndMinutes}`
 
                                     $("#end-time").val(newEndTimeString);
                                     $("#event-id").val(id);
@@ -510,12 +510,48 @@
             resizingElement.dataset.initResize = 'false';
         }
     })
-    
+
     function getDurationInMinutes(duringTime) {
         if (!duringTime) return 0;
         const [hours, minutes, seconds] = duringTime.split(':').map(Number);
         return (hours * 60) + minutes;
     }
+
+    const startTimeInput = document.getElementById('start-time');
+    const endTimeInput = document.getElementById('end-time');
+    const duringTimeInput = document.getElementById('during-time');
+
+    function calculateDuringTimeInput(){
+        var startTimeInputValue = startTimeInput.value;
+        var endTimeInputValue = endTimeInput.value;
+
+        if(!startTimeInputValue || !endTimeInputValue){
+            return;
+        }
+
+        var [startHour, startMinute] = startTimeInputValue.split(':').map(Number);
+        var [endHour, endMinute] = endTimeInputValue.split(':').map(Number);
+
+        var startTotalMinute = startHour * 60 + startMinute;
+        var endTotalMinute = endHour * 60 + endMinute;
+
+        if(startTotalMinute > endTotalMinute){
+            endTotalMinute += 1440;
+        }
+
+        var differenceTotalMinute = endTotalMinute - startTotalMinute;
+
+        var differenceHour = differenceTotalMinute / 60;
+        var differenceMinute = differenceTotalMinute % 60;
+
+        var formattedHour = String(differenceHour).padStart(2, '0');
+        var formattedMinute = String(differenceMinute).padStart(2, '0');
+
+        duringTimeInput.value = `${formattedHour}:${formattedMinute}`;
+    }
+
+    startTimeInput.addEventListener('input', calculateDuringTimeInput);
+    endTimeInput.addEventListener('input', calculateDuringTimeInput);
 
     function addEvent() {
         // 防止事件冒泡
