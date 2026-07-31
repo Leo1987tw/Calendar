@@ -3,6 +3,8 @@
 session_start();
 date_default_timezone_set("Asia/Taipei");
 
+$config = require_once __DIR__ . "/../../../db_config/calendar/db_config.php";
+
 class DB {
     protected $dsn;
     protected $options;
@@ -10,7 +12,7 @@ class DB {
     protected $table;
 
     function __construct($table){
-        $config = require "db_config.php";
+        global $config;
         $this->dsn = "mysql:host=" . $config['host'] . "; charset=utf8mb4; dbname=" . $config['dbname'];
         $this->options = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, 
