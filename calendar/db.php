@@ -3,7 +3,7 @@
 session_start();
 date_default_timezone_set("Asia/Taipei");
 
-$config = require_once __DIR__ . "/../../../db_config/calendar/db_config.php";
+$config = require_once __DIR__ . "/../../db_config/calendar/calendar/db_config.php";
 
 class DB {
     protected $dsn;
