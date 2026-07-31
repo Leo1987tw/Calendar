@@ -1,4 +1,23 @@
-<div style="margin: 25px;">
+<div class="input-block left">
+    <div>
+        <label for="">選擇月份</label>
+        <input type="month" id="month" name="month" value="<?= $thisYear . '-' . sprintf('%02d', $thisMonth); ?>" onchange="this.form.submit()">
+    </div>
+    <div>
+        <label for="date">選擇日期</label>
+        <input type="date" id="date" name="date" readonly>
+    </div>
+    <div>
+        <label for="">日期名稱</label>
+        <input type="text">
+    </div>
+    <div style="display: flex; justify-content: center; margin: 10px auto;">
+        <button>新增</button>
+        <button>取消</button>
+    </div>
+</div>
+
+<div class="main">
     <?php
 
     date_default_timezone_set("Asia/Taipei");
@@ -21,21 +40,21 @@
 
     ?>
     <div class="title">
-        <a href="?month=<?= $prevMonth; ?>" class="previous-month">Previous Month</a>
+        <a href="?month=<?= $prevMonth; ?>" class="previous-month">Previous<br>Month</a>
         <div class="this-year"><?= isset($_GET['month']) ? date("Y", strtotime($_GET['month'])) : date("Y") ?></div>
         <div class="this-month"><?= isset($_GET['month']) ? date("M", strtotime($_GET['month'])) : date("M");; ?></div>
-        <a href="?month=<?= $nextMonth; ?>" class="next-month">Next Month</a>
+        <a href="?month=<?= $nextMonth; ?>" class="next-month">Next<br>Month</a>
     </div>
 
     <div class="calendar">
 
-        <div class="weekday date column-0">Sunday</div>
-        <div class="weekday date column-1">Monday</div>
-        <div class="weekday date column-2">Tuesday</div>
-        <div class="weekday date column-3">Wednesday</div>
-        <div class="weekday date column-4">Thursday</div>
-        <div class="weekday date column-5">Friday</div>
-        <div class="weekday date column-6">Saturday</div>
+        <div class="date weekday column-0">Sunday</div>
+        <div class="date weekday column-1">Monday</div>
+        <div class="date weekday column-2">Tuesday</div>
+        <div class="date weekday column-3">Wednesday</div>
+        <div class="date weekday column-4">Thursday</div>
+        <div class="date weekday column-5">Friday</div>
+        <div class="date weekday column-6">Saturday</div>
 
         <?php
 
@@ -66,25 +85,17 @@
     </div>
 </div>
 
-<div class="input-block">
+<div class="input-block right">
     <div>
-        <label for="month">選擇月份</label>
-        <input type="month" id="month" name="month" value="<?= $thisYear . '-' . sprintf('%02d', $thisMonth); ?>" onchange="this.form.submit()">
-    </div>
-    <div>
-        <label for="date">選擇日期</label>
-        <input type="date" id="date" name="date" readonly>
-    </div>
-    <div>
-        <label for="start-time">開始時間</label>
+        <label for="start-time">行程開始</label>
         <input type="time" id="start-time" name="start-time">
     </div>
     <div>
-        <label for="end-time">結束時間</label>
+        <label for="end-time">行程結束</label>
         <input type="time" id="end-time" name="end-time">
     </div>
     <div>
-        <label for="during-time">事件期間</label>
+        <label for="during-time">行程時長</label>
         <input type="time" id="during-time" name="during-time" readonly>
     </div>
     <div>
@@ -106,23 +117,25 @@
         <label for="title">行程標題</label>
         <input type="text" id="title" name="title">
     </div>
-    <div>
+    <div style="display: flex; align-items: flex-start; margin-bottom: 10px;">
         <label for="description">行程描述</label>
-        <textarea name="description" id="description"></textarea>
+        <textarea name="description" id="description" style="width: 120px; height: 60px; margin-top: 15px; margin-left: 20px; border-radius: 5px;"></textarea>
     </div>
-    <div>
-        <label for="color">文字顏色</label>
-        <input type="color" name="color" id="color">
+    <div style="margin-top: 10px;">
+        <div>
+            <label for="color">文字</label>
+            <input type="color" name="color" id="color">
+        </div>
+        <div>
+            <label for="background-color">背景</label>
+            <input type="color" name="background-color" id="background-color">
+        </div>
+        <div>
+            <label for="border-color">邊線</label>
+            <input type="color" name="border-color" id="border-color">
+        </div>
     </div>
-    <div>
-        <label for="background-color">背景顏色</label>
-        <input type="color" name="background-color" id="background-color">
-    </div>
-    <div>
-        <label for="border-color">邊線顏色</label>
-        <input type="color" name="border-color" id="border-color">
-    </div>
-    <div style="display: flex;">
+    <div style="display: flex; justify-content: center; align-items: center; margin: 30px auto;">
         <input type="hidden" id="id" name="id">
         <button type="button" class="event-btn" onclick="addEvent()">新增行程</button>
         <button type="button" class="event-btn" onclick="editEvent()">編輯行程</button>
@@ -138,7 +151,7 @@
 
     // 防止連點所設旗標
     let isAnimating = false;
-    
+
     window.addEventListener('click', function(event) {
         if (isAnimating) return;
 
@@ -459,7 +472,7 @@
                                     let [hours, minutes] = startTimeString.split(':').map(Number);
                                     let totalMinutes = hours * 60 + newDurationMinutes;
 
-                                    if(totalMinutes > 1439)totalMinutes = 1439;
+                                    if (totalMinutes > 1439) totalMinutes = 1439;
 
                                     const newEndHours = String(Math.floor(totalMinutes / 60)).padStart(2, '0');
                                     const newEndMinutes = String(totalMinutes % 60).padStart(2, '0');
@@ -503,7 +516,7 @@
             })
             .catch(error => console.error('fetch failed:', error));
     }
-    
+
     window.addEventListener('mouseup', () => {
         const resizingElement = document.querySelector('[data-init-resize="true"]');
         if (resizingElement) {
@@ -521,11 +534,11 @@
     const endTimeInput = document.getElementById('end-time');
     const duringTimeInput = document.getElementById('during-time');
 
-    function calculateDuringTimeInput(){
+    function calculateDuringTimeInput() {
         var startTimeInputValue = startTimeInput.value;
         var endTimeInputValue = endTimeInput.value;
 
-        if(!startTimeInputValue || !endTimeInputValue){
+        if (!startTimeInputValue || !endTimeInputValue) {
             return;
         }
 
@@ -535,7 +548,7 @@
         var startTotalMinute = startHour * 60 + startMinute;
         var endTotalMinute = endHour * 60 + endMinute;
 
-        if(startTotalMinute > endTotalMinute){
+        if (startTotalMinute > endTotalMinute) {
             endTotalMinute += 1440;
         }
 
