@@ -6,15 +6,17 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 date_default_timezone_set("Asia/Taipei");
 
-$pdo = require_once __DIR__ . "/db_config.php";
+$config = require_once "./db_config.php";
 
 class DB {
+    protected $dsn;
     protected $pdo;
     protected $table;
 
     public function __construct($table) {
-        global $pdo;
-        $this->pdo = $pdo;
+        global $config;
+        $this->dsn = "mysql:host=" . $config['host'] . "; charset=utf8; dbname=" . $config['dbname'];
+        $this->pdo = new PDO($this->dsn, $config['username'], $config['password'], []);
         $this->table = $table;
     }
 

@@ -295,7 +295,7 @@ button {
         order: 3;
     }
 
-    .title.calendar {
+    .title, .calendar {
         width: 100%;
     }
 }

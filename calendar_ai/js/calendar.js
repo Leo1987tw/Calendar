@@ -793,3 +793,29 @@ function deleteEvent(e) {
         showToast("錯誤: " + err, 'error');
     });
 }
+
+function calculateDuration(){
+    const start = document.getElementById("start-time").value;
+    const end = document.getElementById("end-time").value;
+    const duringInput = document.getElementById("during-time");
+
+    if(!start || !end){
+        duringInput.value = "";
+        return;
+    }
+
+    const [startHour, startMinute] = start.split(":").map(Number);
+    const [endHour, endMinute] = end.split(":").map(Number);
+
+    let differenceMinutes = (endHour * 60 + endMinute) - (startHour * 60 + startMinute);
+
+    if(differenceMinutes < 0)differenceMinutes += 1440;
+
+    const hour = Math.floor(differenceMinutes / 60);
+    const minute = differenceMinutes % 60;
+
+    duringInput.value = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+}
+
+document.getElementById("start-time").addEventListener("input", calculateDuration);
+document.getElementById("end-time").addEventListener("input", calculateDuration);
